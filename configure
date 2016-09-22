@@ -28473,23 +28473,6 @@ echo "define(<WANT_R_REGISTERS>,<$gmp_cv_asm_powerpc_r_registers>)" >> $gmp_tmpc
 
 echo "include_mpn(\`powerpc32/powerpc-defs.m4')" >> $gmp_tmpconfigm4i
 
-
-      # Check for Linux ELFv2 ABI
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#if _CALL_ELF == 2
-yes
-#endif
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "yes" >/dev/null 2>&1; then :
-
-echo "define(<ELFv2_ABI>)" >> $gmp_tmpconfigm4
-
-fi
-rm -f conftest*
-
-
       case $host in
         *-*-aix*)
 	  case $ABI in

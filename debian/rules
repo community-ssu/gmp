@@ -1,9 +1,9 @@
 #!/usr/bin/make -f
+include /usr/share/quilt/quilt.make
 
 ORIG_SRC_VERSION = 5.1.3
 
 DPKG_EXPORT_BUILDFLAGS = 1
-include /usr/share/dpkg/buildflags.mk
 
 # Uncomment this to turn on verbose mode. 
 #export DH_VERBOSE=1
@@ -19,7 +19,6 @@ endif
 DEB_HOST_ARCH  ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 export DEB_HOST_GNU_TYPE  := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 export DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-export DEB_HOST_MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 MAKE_CHECK = : disabled make check
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
@@ -41,6 +40,9 @@ else
   endif
 endif
 
+ifneq (,$(findstring thumb,$(DEB_BUILD_OPTIONS)))
+        CFLAGS += -mthumb
+endif
 
 confflags = --prefix=/usr --enable-cxx
 
@@ -62,7 +64,7 @@ ifneq (,$(findstring $(DEB_HOST_ARCH), x32))
   confflags += ABI=x32
 endif
 
-confflags_ma = $(confflags) $(confflags_build) --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
+confflags_ma = $(confflags) $(confflags_build) --libdir=/usr/lib/
 
 CC   = $(DEB_HOST_GNU_TYPE)-gcc
 CXX   = $(DEB_HOST_GNU_TYPE)-g++
@@ -93,14 +95,14 @@ configure-stamp:
 	    CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)"
 	touch $@
 
-build: build-stamp
+build: build-stamp $(QUILT_STAMPFN)
 build-stamp: configure
 	dh_testdir
 	$(MAKE) $(JOBSFLAG) -C build
 	$(MAKE_CHECK) -C build
 	touch $@
 
-clean:
+clean: unpatch
 	dh_testdir
 	dh_testroot
 	rm -rf build build-stamp
@@ -117,14 +119,14 @@ install: build-stamp install-prep
 	rm -rf debian/tmp
 	# Install places gmp.h in 'includeexecdir' which is non-standard and cannot be set at compile time,
 	# so override it at install.
-	$(MAKE) DESTDIR=`pwd`/debian/tmp includeexecdir=/usr/include/$(DEB_HOST_MULTIARCH) -C build install
+	$(MAKE) DESTDIR=`pwd`/debian/tmp includeexecdir=/usr/include/ -C build install
 
-	dh_install -plibgmp10 usr/lib/*/libgmp.so.*
-	dh_install -plibgmpxx4ldbl usr/lib/*/libgmpxx.so.*
+	dh_install -plibgmp10 --sourcedir=debian/tmp usr/lib/libgmp.so.*
+	dh_install -plibgmpxx4ldbl --sourcedir=debian/tmp usr/lib/libgmpxx.so.*
 
-	dh_install -plibgmp-dev usr/lib/*/lib*.so
-	dh_install -plibgmp-dev usr/lib/*/lib*.a
-	dh_install -plibgmp-dev usr/include
+	dh_install -plibgmp-dev --sourcedir=debian/tmp usr/lib/lib*.so
+	dh_install -plibgmp-dev --sourcedir=debian/tmp usr/lib/lib*.a
+	dh_install -plibgmp-dev --sourcedir=debian/tmp usr/include/*
 
 	# Install upstream ChangeLog, AUTHORS, NEWS, and README only in -dev package
 	dh_installchangelogs -plibgmp-dev
@@ -139,8 +141,7 @@ binary-common:
 	sed -i "/dependency_libs/ s/'.*'/''/" `find debian/ -name '*.la'`
 	dh_testdir
 	dh_testroot
-	# User lower compatibility to avoid installing upstream changelog in all packages
-	DH_COMPAT=6 dh_installchangelogs
+	dh_installchangelogs
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu

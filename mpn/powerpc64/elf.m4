@@ -18,11 +18,7 @@ dnl
 dnl  You should have received a copy of the GNU Lesser General Public License
 dnl  along with the GNU MP Library.  If not, see http://www.gnu.org/licenses/.
 
-define(`ASM_START',
-`ifdef(`ELFv2_ABI',
-`
-	.abiversion 2
-')')
+define(`ASM_START',`')
 
 dnl  Called: PROLOGUE_cpu(GSYM_PREFIX`'foo)
 dnl          EPILOGUE_cpu(GSYM_PREFIX`'foo)
@@ -30,17 +26,7 @@ dnl
 
 define(`PROLOGUE_cpu',
 m4_assert_numargs(1)
-`ifdef(`ELFv2_ABI',
-`
-	.globl	$1
-	.type	$1, @function
-	.section	".text"
-	.align	5
-$1:
-0:	addis	2, 12, (.TOC.-0b)@ha
-	addi	2, 2, (.TOC.-0b)@l
-	.localentry $1, .-$1
-',`
+	`
 	.globl	$1
 	.globl	.$1
 	.section	".opd","aw"
@@ -51,16 +37,11 @@ $1:
 	.type	.$1, @function
 	.section	".text"
 	.align	5
-.$1:
-')')
+.$1:')
 
 define(`EPILOGUE_cpu',
 m4_assert_numargs(1)
-`ifdef(`ELFv2_ABI',`
-	.size	$1, .-$1
-',`
-	.size	.$1, .-.$1
-')')
+`	.size	.$1, .-.$1')
 
 define(`TOC_ENTRY', `')
 
