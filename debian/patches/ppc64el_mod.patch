@@ -1,0 +1,36 @@
+Description: Support ppc64el.
+Author: Torbjorn Granlund <tege@gmplib.org>
+Origin: upstream, https://gmplib.org/repo/gmp/rev/221a3c6d87fd
+
+Index: gmp-5.1.2+dfsg/mpn/powerpc64/mode64/mod_1_1.asm
+===================================================================
+--- gmp-5.1.2+dfsg.orig/mpn/powerpc64/mode64/mod_1_1.asm	2013-05-20 14:59:57.000000000 +0000
++++ gmp-5.1.2+dfsg/mpn/powerpc64/mode64/mod_1_1.asm	2013-12-16 09:10:30.830071826 +0000
+@@ -69,7 +69,10 @@
+ 	adde	r9, r9, r10
+ 	bdnz	L(top)
+ 
+-L(end):	lwz	r0, 12(r6)
++L(end):
++ifdef(`HAVE_LIMB_LITTLE_ENDIAN',
++`	lwz	r0, 8(r6)',
++`	lwz	r0, 12(r6)')
+ 	ld	r3, 0(r6)
+ 	cmpdi	cr7, r0, 0
+ 	beq-	cr7, L(4)
+Index: gmp-5.1.2+dfsg/mpn/powerpc64/mode64/mod_1_4.asm
+===================================================================
+--- gmp-5.1.2+dfsg.orig/mpn/powerpc64/mode64/mod_1_4.asm	2013-05-20 14:59:57.000000000 +0000
++++ gmp-5.1.2+dfsg/mpn/powerpc64/mode64/mod_1_4.asm	2013-12-16 09:10:30.830071826 +0000
+@@ -144,7 +144,10 @@
+ 	adde	r9, r7, r4
+ 	bdnz	L(top)
+ 
+-L(end):	lwz	r3, 12(cps)
++L(end):
++ifdef(`HAVE_LIMB_LITTLE_ENDIAN',
++`	lwz	r3, 8(cps)',
++`	lwz	r3, 12(cps)')
+ 	mulld	r10, r9, r26
+ 	mulhdu	r9, r9, r26
+ 	addc	r11, r0, r10

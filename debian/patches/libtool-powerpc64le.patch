@@ -1,0 +1,17 @@
+Index: b/config.guess
+===================================================================
+--- a/config.guess
++++ b/config.guess
+@@ -1001,6 +1001,12 @@
+     ppcle:Linux:*:*)
+ 	echo powerpcle-unknown-linux-${LIBC}
+ 	exit ;;
++    ppc64el:Linux:*:*)
++	echo powerpc64le-unknown-linux-${LIBC}
++	exit ;;
++    ppcle:Linux:*:*)
++	echo powerpcle-unknown-linux-${LIBC}
++	exit ;;
+     s390:Linux:*:* | s390x:Linux:*:*)
+ 	echo ${UNAME_MACHINE}-ibm-linux-${LIBC}
+ 	exit ;;
