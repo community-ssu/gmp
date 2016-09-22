@@ -33,11 +33,7 @@ endif
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
   CFLAGS += -O0
 else
-  ifneq (,$(findstring $(DEB_HOST_ARCH), ia64))
-    CFLAGS += -O2
-  else
-    CFLAGS += -O3
-  endif
+  CFLAGS += -O2
 endif
 
 ifneq (,$(findstring thumb,$(DEB_BUILD_OPTIONS)))
@@ -105,7 +101,7 @@ build-stamp: configure
 clean: unpatch
 	dh_testdir
 	dh_testroot
-	rm -rf build build-stamp
+	rm -rf build build-stamp configure-stamp
 	dh_autoreconf_clean
 	dh_clean
 
